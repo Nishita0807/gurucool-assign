@@ -1,0 +1,45 @@
+
+services:
+  # Node.js API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Points to the Dockerfile in the current directory
+    ports:
+      - "5000:5000"  # Maps port 5000 on the host to port 5000 in the container
+    environment:
+      - MONGO_URI=${MONGO_URI}  # Reads Mongo URI from .env file
+      - QUEUE_HOST=rabbitmq  # Change to redis or kafka if using them
+      - QUEUE_PORT=5672       # Port for RabbitMQ/Redis/Kafka
+    depends_on:
+      - mongo
+      - rabbitmq  # RabbitMQ is a dependency (change if using Redis/Kafka)
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - backend
+
+  # MongoDB Service
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"  # Maps MongoDB's port
+    volumes:
+      - ./data/mongo:/data/db
+    networks:
+      - backend
+
+  # RabbitMQ Service (or Redis/Kafka)
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"       # Default RabbitMQ port for communication
+      - "15672:15672"     # Management console for RabbitMQ
+    networks:
+      - backend
+
+
+
+networks:
+  backend:
+    driver: bridge

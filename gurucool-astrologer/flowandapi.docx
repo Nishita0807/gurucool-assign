@@ -1,0 +1,55 @@
+1.Pseudocode:
+Initialize all astrologers with their connectionWeight (default is 1 for regular astrologers, higher for top ones).
+For each user, assign the user to an astrologer based on the following formula:
+astrologerScore = connectionWeight / totalConnections
+Distribute users to astrologers based on the highest astrologerScore.
+
+2.API Design
+Create RESTful endpoints for managing flow distribution and controlling the settings for top astrologers.
+2.1 Endpoints:
+GET /astrologers: List all astrologers and their flow details.
+POST /astrologers/toggleTop: Toggle an astrologer’s top status.
+POST /distribute: Distribute users based on the current flow distribution algorithm.
+
+3.API Requests:
+3.1.Get all astrologers:
+GET /api/astrologers
+Response:
+json
+[
+  { "id": 1, "name": "Astro1", "isTop": false, "connectionWeight": 1, "totalConnections": 10 },
+  { "id": 2, "name": "Astro2", "isTop": false, "connectionWeight": 1, "totalConnections": 12 },
+  { "id": 3, "name": "Astro3", "isTop": true, "connectionWeight": 2, "totalConnections": 15 }
+]
+
+3.2.Distribute users:
+POST /api/distribute
+Response:
+json
+{
+  "message": "Users have been distributed",
+  "users": [
+    { "id": 1, "name": "User1", "connectedTo": 3 },
+    { "id": 2, "name": "User2", "connectedTo": 2 },
+    { "id": 3, "name": "User3", "connectedTo": 1 }
+  ]
+}
+
+3.3.Toggle top astrologer status:
+POST /api/astrologers/toggleTop
+Content-Type: application/json
+{
+  "astrologerId": 1
+}
+Response:
+json
+{
+  "message": "Astrologer Astro1 top status updated.",
+  "astrologer": {
+    "id": 1,
+    "name": "Astro1",
+    "isTop": true,
+    "connectionWeight": 2,
+    "totalConnections": 0
+  }
+}
